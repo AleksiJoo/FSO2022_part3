@@ -8,7 +8,7 @@ app.use(morgan(":method :url :status :response-time ms :body"))
 
 morgan.token("body", (req, res) => JSON.stringify(req.body))
 
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
