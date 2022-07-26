@@ -12,10 +12,20 @@ app.use(morgan(":method :url :status :response-time ms :body"))
 
 morgan.token("body", (req, res) => JSON.stringify(req.body))
 
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+    if (error.name === 'ValidationError') {
+        return response.status(400).json({error: error.message})
+    }
+    next(error)
+}
+
 const PORT = process.env.PORT
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
+
+
 
 let persons = [
     {
@@ -40,8 +50,6 @@ let persons = [
 
     }
 ]
-
-
 
 app.get("/api/persons", (request, response) => {
     Person.find({}).then(people => {
@@ -75,19 +83,13 @@ app.delete("/api/persons/:id", (request, response, next) =>{
     .catch(error => next(error))
 })
 
-app.post("/api/persons/", (request, response) => {
+app.post("/api/persons/", (request, response, next) => {
     const body = request.body
-
-    if(!body.name || !body.number) {
-        return response.status(400).json({
-            error: "content missing"
-        })
-    } 
+    console.log(body)
 
     const person = new Person({
         name: body.name,
         number: body.number,
-        //id: Math.floor(Math.random() * 100)
     })
 
     /*if (persons.find(p => p.name === person.name)) {
@@ -95,8 +97,11 @@ app.post("/api/persons/", (request, response) => {
             error: "name must be unique"
         })*/
 
-    person.save().then(savedPerson => {
+    person.save()
+    .then(savedPerson => {
         response.json(savedPerson)
     })
+    .catch(error => next(error))
 })
 
+app.use(errorHandler)
