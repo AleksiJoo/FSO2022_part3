@@ -4,12 +4,12 @@ const url = process.env.MONGODB_URI
 console.log("connecting to ", url)
 
 mongoose.connect(url)
-.then(results => {
-    console.log("Connected to MongoDB")
-})
-.catch((error) => {
-    console.log("Error connecting to MongoDB: ", error.message)
-})
+    .then(() => {
+        console.log("Connected to MongoDB")
+    })
+    .catch((error) => {
+        console.log("Error connecting to MongoDB: ", error.message)
+    })
 
 const personSchema = new mongoose.Schema({
     name: {
@@ -21,7 +21,7 @@ const personSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-  })
+})
 
 personSchema.set("toJSON", {
     transform: (document, returnedObject) => {
@@ -39,7 +39,7 @@ if (process.argv.length === 3) {
         result.forEach(person => console.log(person))
         mongoose.connection.close()
     })
-    
+
 }
 
 else if (process.argv.length > 3) {
